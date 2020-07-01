@@ -142,7 +142,8 @@ zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:
 
 #zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 zstyle ':completion:*' recent-dirs-insert both
-zstyle ':completion:*:*files' ignored-patterns '*?.o' '*?~' '*\#' '^_.*$'
+#zstyle ':completion:*:*files' ignored-patterns '*?.o' '*?~' '*\#' '^_.*$'
+zstyle ':completion:*:*files' ignored-patterns '*?.o' '*?~' '*\#'
 # Userは補完候補に出さない
 zstyle ':completion:*' users
 zstyle ':completion:*' parameter
