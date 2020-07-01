@@ -1,0 +1,113 @@
+leaderkeyを@に変更
+:let mapleader="@"
+
+バックスペース化ける対策
+noremap!  
+
+[insert mode]
+カッコでくくる時二回押すと括られる
+ex: (+( = ()
+inoremap (( ()<LEFT>
+inoremap {{ {}<LEFT>
+inoremap "" ""<LEFT>
+inoremap [[ []<LEFT>
+inoremap '' ''<LEFT>
+inoremap `` ``<LEFT>
+inoremap << <><LEFT>
+
+Ctrl−lで右カーソル
+inoremap <C-l> <Right>
+
+jjでESC
+inoremap <silent> jj <c-[>
+
+tabで次の候補へ、shift-tabで前の候補
+inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<S-TAB>"
+
+Enterで候補を選択
+inoremap <expr><CR>  pumvisible() ? deoplete#close_popup() : "<CR>"
+
+Ctrl-eで補完をキャンセル
+inoremap <expr><C-e> deoplete#cancel_popup()
+inoremap <expr><C-e> pumvisible() ? deoplete#cancel_popup() :""
+
+shift+spaceでマニュアル補完
+inoremap <expr> <S-SPACE> pumvisible() ? "\<down>" : deoplete#start_manual_complete()
+
+Ctrl-x,Ctrl-xで日本語から英語への補完
+inoremap <silent> <C-x><C-x> <C-R>=<SID>codic_complete()<CR>
+
+[normal mode]
+Tでwindowsを横に分割
+nmap T :new <CR>
+
+tでwindowsを横に分割
+nmap t :vnew <CR>
+
+;qでquick windowsを閉じる
+nmap ;q :cclose<CR>
+
+Shift+k,Shift+jでquick windowでの上下移動
+nnoremap <S-k> :cN<CR>zz
+nnoremap <S-j> :cnext<CR>zz
+
+(単語の上で)c+*で単語を置換
+nnoremap <expr> c* ':%s ;\<' . expand('<cword>') . '\>;'
+
+Ctrl+nで新しいタブを開く
+nnoremap <C-n> :tabnew<cr>
+
+Ctrl+@でプログラムを実行
+map <silent> <C-@> :call <SID>Exec()<CR>
+
+Shift+oで改行
+nnoremap O :<C-u>call append(expand('.'), '')<Cr>j
+
+ESC+ESCでhighlightを消す
+nnoremap <ESC><ESC> :nohlsearch<CR>
+
+Ctrl+gでカーソル上の単語を開いているファイル内でgrep
+nnoremap <expr> <C-g> ':vimgrep ;\<' . expand('<cword>') . '\>; % \| cw <CR>'
+
+Ctrl-sで今開いているファイルを保存
+nnoremap <C-s> :browse confirm saveas<CR>
+
+Ctrl+cでコメントアウトの付け外し
+nnoremap <C-c> :TComment<CR>
+
+-で行の末尾に移動
+nnoremap - $
+
+s,S,f,Fでeasymotionを呼び出し
+vmap s <Plug>(easymotion-s2)
+nmap s <Plug>(easymotion-s2)
+map f <Plug>(easymotion-fl)
+map F <Plug>(easymotion-Fl)
+
+Ctrl+tCtrl+tでTableModeに入る、Ctrl-dで抜ける
+nmap <c-t><c-t> :TableModeEnable<CR>
+nmap <c-d> :TableModeDisable<CR>
+
+Ctrl+w+(><+-)でwindowの大きさを調整
+call submode#map('winsize', 'n', '', '>', '<C-w>>')
+call submode#map('winsize', 'n', '', '<', '<C-w><')
+call submode#map('winsize', 'n', '', '+', '<C-w>-')
+call submode#map('winsize', 'n', '', '-', '<C-w>+')
+
+Ctrl+aで自分のいるディレクトリ配下をgrep
+nnoremap <expr> <C-a> ':Ag '. expand('<cword>')
+
+[visual mode]
+
+vで行末まで選択
+vnoremap v $h
+
+Ctrl-eで選択している分を置換
+vnoremap <C-e> y:%s/<C-r>"//g
+
+Ctrl+cでコメントアウトの付け外し
+vnoremap <C-c> :TComment<CR>
+
+Ctrl+gで文のgrep
+vnoremap <C-g> y:vimgrep <C-r>" % \|cw

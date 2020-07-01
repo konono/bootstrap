@@ -1,0 +1,24 @@
+[[plugins]]
+repo = 'kana/vim-submode'
+"on_cmd = 'SubmodeRestoreOptions'
+hook_source = 'source /Users/yukiy/.config/nvim/submode.rc.vim'
+"hook_add = '''
+"let g:submode_timeout = 0
+"let g:submode_timeoutlen = 1000000
+"
+"augroup MyAutoCmd
+"  autocmd!
+"augroup END
+"
+"if dein#tap('vim-submode')
+"  function! s:submode_on_source() abort
+"    call submode#enter_with('winsize', 'n', '', '<C-w>>', '<C-w>>')
+"    call submode#enter_with('winsize', 'n', '', '<C-w><', '<C-w><')
+"    call submode#enter_with('winsize', 'n', '', '<C-w>+', '<C-w>-')
+"    call submode#enter_with('winsize', 'n', '', '<C-w>-', '<C-w>+')
+"    call submode#map('winsize', 'n', '', '>', '<C-w>>')
+"    call submode#map('winsize', 'n', '', '<', '<C-w><')
+"    call submode#map('winsize', 'n', '', '+', '<C-w>-')
+"    call submode#map('winsize', 'n', '', '-', '<C-w>+')
+"endfunction
+"'''

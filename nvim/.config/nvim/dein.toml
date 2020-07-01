@@ -1,0 +1,309 @@
+[[plugins]]
+repo = 'Shougo/dein.vim'
+
+[[plugins]]
+repo = 'Shougo/deoplete.nvim'
+hook_add = '''
+call dein#add('Shougo/deoplete.nvim')
+let g:deoplete#enable_at_startup = 1
+
+" 補完が自動で開始される文字数
+let g:deoplete#auto_completion_start_length = 3
+
+" 入力文字がこれ以上だと補完しない
+let g:deoplete#MaxTryKeywordLength=10
+
+" smart case有効化。 大文字が入力されるまで大文字小文字の区別を無視する smart_case
+"ポップアップメニューで表示される候補の数。初期値は100 max_list
+call deoplete#custom#option({
+\ 'auto_complete_delay': 200,
+\ 'smart_case': v:true,
+\ 'max_list': 20,
+\ })
+
+" camle caseを有効化。大文字を区切りとしたワイルドカードのように振る舞う
+let g:deoplete#enable_camel_case_completion = 1
+
+" _(アンダーバー)区切りの補完を有効化
+let g:deoplete#enable_underbar_completion = 1
+
+" シンタックスをキャッシュするときの最小文字長を3に
+let g:deoplete#min_syntax_length = 3
+
+" -入力による候補番号の表示
+let g:deoplete#enable_quick_match = 1
+
+let g:deoplete#lock_buffer_name_pattern = '\*ku\*'
+
+"変換候補をタブで移動
+inoremap <expr><tab> pumvisible() ? "\<C-n>" :
+        \ neosnippet#expandable_or_jumpable() ?
+        \    "\<Plug>(neosnippet_expand_or_jump)" : "\<tab>"
+inoremap <expr><S-tab>  pumvisible() ? "\<C-p>" : "\<S-tab>"
+
+" 補完候補が出ていたら確定、なければ改行
+inoremap <expr><CR>  pumvisible() ? deoplete#close_popup() : "<CR>"
+
+" C-Kで展開
+" neoplete-snippets
+imap <C-k> <Plug> (deoplete_snippets_expand)
+smap <C-k> <Plug> (deoplete_snippets_expand)
+
+" 補完をキャンセルしpopupを閉じる
+inoremap <expr><C-e> deoplete#cancel_popup()
+inoremap <expr><C-e> pumvisible() ? deoplete#cancel_popup() :""
+
+"<Ctrl+Space> ：手動補完候補表示
+let g:deoplete#disable_auto_complete = 0
+inoremap <expr> <S-SPACE> pumvisible() ? "\<down>" : deoplete#start_manual_complete()
+" メニューの一番目を自動選択
+let g:deoplete#enable_auto_select = 0
+
+" <C-h>, <BS>: close popup and delete backword char.
+inoremap <expr><C-h> deoplete#smart_close_popup()."\<C-h>"
+inoremap <expr><BS> deoplete#smart_close_popup()."\<C-h>"
+'''
+on_i = 1
+
+[[plugins]]
+repo = 'Shougo/denite.nvim'
+
+
+[[plugins]]
+repo = 'Shougo/neomru.vim'
+
+[[plugins]]
+repo = 'itchyny/lightline.vim'
+hook_add = '''
+set laststatus=2
+let g:lightline = {
+        \ 'colorscheme': 'wombat',
+        \ 'mode_map': {'c': 'NORMAL'},
+        \ 'active': {
+        \   'left': [ [ 'mode', 'paste' ], [ 'fugitive', 'filename' ] ]
+        \ },
+        \ 'component_function': {
+        \   'modified': 'LightLineModified',
+        \   'readonly': 'LightLineReadonly',
+        \   'fugitive': 'LightLineFugitive',
+        \   'filename': 'LightLineFilename',
+        \   'fileformat': 'LightLineFileformat',
+        \   'filetype': 'LightLineFiletype',
+        \   'fileencoding': 'LightLineFileencoding',
+        \   'mode': 'LightLineMode'
+        \ }
+        \ }
+
+function! LightLineModified()
+  return &ft =~ 'help\|vimfiler\|gundo' ? '' : &modified ? '+' : &modifiable ? '' : '-'
+endfunction
+
+function! LightLineReadonly()
+  return &ft !~? 'help\|vimfiler\|gundo' && &readonly ? 'x' : ''
+endfunction
+
+function! LightLineFilename()
+  return ('' != LightLineReadonly() ? LightLineReadonly() . ' ' : '') .
+        \ (&ft == 'vimfiler' ? vimfiler#get_status_string() :
+        \  &ft == 'unite' ? unite#get_status_string() :
+        \  &ft == 'vimshell' ? vimshell#get_status_string() :
+        \ '' != expand('%:t') ? expand('%:t') : '[No Name]') .
+        \ ('' != LightLineModified() ? ' ' . LightLineModified() : '')
+endfunction
+
+function! LightLineFugitive()
+  try
+    if &ft !~? 'vimfiler\|gundo' && exists('*fugitive#head')
+      return fugitive#head()
+    endif
+  catch
+  endtry
+  return ''
+endfunction
+
+function! LightLineFileformat()
+  return winwidth(0) > 70 ? &fileformat : ''
+endfunction
+
+function! LightLineFiletype()
+  return winwidth(0) > 70 ? (strlen(&filetype) ? &filetype : 'no ft') : ''
+endfunction
+
+function! LightLineFileencoding()
+  return winwidth(0) > 70 ? (strlen(&fenc) ? &fenc : &enc) : ''
+endfunction
+
+function! LightLineMode()
+  return winwidth(0) > 60 ? lightline#mode() : ''
+endfunction
+'''
+
+[[plugins]]
+repo = 'koron/codic-vim'
+hook_add = '''
+inoremap <silent> <C-x> <C-R>=<SID>codic_complete()<CR>
+
+function! s:codic_complete()
+  let line = getline('.')
+  let start = match(line, '\k\+$')
+  let cand = s:codic_candidates(line[start :])
+  call complete(start +1, cand)
+  return ''
+endfunction
+function! s:codic_candidates(arglead)
+  let cand = codic#search(a:arglead, 30)
+  " error
+  if type(cand) == type(0)
+    return []
+  endif
+  " english -> english terms
+  if a:arglead =~# '^\w\+$'
+    return map(cand, '{"word": v:val["label"], "menu": join(map(copy(v:val["values"]), "v:val.word"), ",")}')
+  endif
+  " japanese -> english terms
+  return s:reverse_candidates(cand)
+endfunction
+function! s:reverse_candidates(cand)
+  let _ = []
+  for c in a:cand
+    for v in c.values
+      call add(_, {"word": v.word, "menu": !empty(v.desc) ? v.desc : c.label })
+    endfor
+  endfor
+  return _
+endfunction
+'''
+
+[[plugins]]
+repo = 'Lokaltog/vim-easymotion'
+hook_add = '''
+let g:EasyMotion_do_mapping = 0 "Disable default mappings
+vmap s <Plug>(easymotion-s2)
+nmap s <Plug>(easymotion-s2)
+map f <Plug>(easymotion-fl)
+"map t <Plug>(easymotion-tl)
+map F <Plug>(easymotion-Fl)
+"map T <Plug>(easymotion-Tl)
+'''
+
+[[plugins]]
+repo = 'dhruvasagar/vim-table-mode'
+hook_add = '''
+let g:table_mode_corner_corner="+"
+let g:table_mode_header_fillchar="="
+nmap <c-t><c-t> :TableModeEnable<CR>
+nmap <c-d> :TableModeDisable<CR>
+'''
+
+[[plugins]]
+repo = 'rking/ag.vim'
+hook_add = '''
+"nnoremap <expr> <C-a> ':Ag '. expand('<cword>')
+'''
+
+[[plugins]]
+repo = 'tomtom/tcomment_vim'
+hook_add = '''
+nnoremap <C-c> :TComment<CR>
+vnoremap <C-c> :TComment<CR>
+'''
+
+[[plugins]]
+repo = 'godlygeek/tabular'
+
+[[plugins]]
+repo = 'plasticboy/vim-markdown'
+
+[[plugins]]
+repo = 'iwataka/minidown.vim'
+hook_add = '''
+nnoremap <F5> :Minidown<CR>
+'''
+
+[[plugins]]
+repo = 'szw/vim-tags' 
+hook_add = '''
+let g:vim_tags_project_tags_command = "$HOME/.linuxbrew/bin/ctags -R {OPTIONS} {DIRECTORY} 2>/dev/null"
+let g:vim_tags_gems_tags_command = "$HOME/.linuxbrew/bin/ctags -R {OPTIONS} `bundle show --paths` 2>/dev/null"
+'''
+
+[[plugins]]
+repo = 'Shougo/neosnippet'
+hook_add = '''
+imap <C-k> <Plug>(neosnippet_expand_or_jump)
+smap <C-k> <Plug>(neosnippet_expand_or_jump)
+xmap <C-k> <Plug>(neosnippet_expand_target)
+if has('conceal')
+  set conceallevel=2 concealcursor=niv
+endif
+'''
+on_i  = 1
+on_ft = ['snippet']
+depends = ['neosnippet-snippets']
+
+[[plugins]]
+repo = 'Shougo/neosnippet-snippets'
+
+[[plugins]]
+repo = 'nathanaelkane/vim-indent-guides'
+hook_add = '''
+set tabstop=2
+set shiftwidth=2
+set expandtab
+
+let g:indent_guides_enable_on_vim_startup=1
+let g:indent_guides_start_level=2
+let g:indent_guides_auto_colors=0
+autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  guibg=#262626 ctermbg=gray
+autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=#3c3c3c ctermbg=darkgray
+let g:indent_guides_color_change_percent = 30
+let g:indent_guides_guide_size = 1
+'''
+
+[[plugins]]
+repo = 'tbodt/deoplete-tabnine'
+on_event = ['InsertEnter']
+build = './install.sh'
+
+[[plugins]]
+repo = 'davidhalter/jedi-vim'
+on_ft = 'python'
+hook_add = '''
+  let g:jedi#use_tabs_not_buffers = 1
+  let g:jedi#popup_select_first = 0 
+  let g:jedi#popup_on_dot = 1
+  let g:jedi#goto_command = "<leader>d"
+  let g:jedi#goto_assignments_command = "<leader>g"
+  let g:jedi#goto_definitions_command = ""
+  let g:jedi#documentation_command = "<leader>k"
+  let g:jedi#usages_command = "<leader>n"
+  let g:jedi#rename_command = "<leader>R" 
+  autocmd FileType python setlocal completeopt-=preview
+'''
+
+[[plugins]]
+repo = 'fatih/vim-go'
+hook_add = '''
+autocmd FileType go autocmd BufWritePre <buffer> GoFmt
+exe "set rtp+=".globpath($GOPATH, "src/github.com/nsf/gocode/vim")
+let g:neocomplete#sources#omni#function = {'go': 'go#complete#Complete'}
+let g:go_highlight_functions = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_fields = 1
+let g:go_highlight_types = 1
+let g:go_highlight_operators = 1
+let g:go_highlight_build_constraints = 1
+'''
+
+[[plugins]]
+repo = 'zchee/deoplete-jedi'
+hook_add = '''
+call dein#add('zchee/deoplete-go', {'build': 'make'})
+'''
+
+[[plugins]]
+repo = 'zchee/deoplete-go'
+hook_add = '''
+call dein#add('zchee/deoplete-go', {'build': 'make'})
+'''
+

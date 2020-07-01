@@ -1,0 +1,7 @@
+{
+    "Keymap": {
+        "C-j": "peco.SellectUp",
+        "C-k": "peco.SellectDown",
+        "C-x,C-c": "peco.Cancel"
+    }
+}

@@ -1,0 +1,17 @@
+#eval $(dircolors -b ~/.dirc)
+#xinput set-prop 10 "Device Enabled" 0
+# Profiling option
+# zmodload zsh/zprof && zprof
+
+###! configure enviroment !###
+export PATH="${PATH}:${HOME}/local/bin:$GOPATH/bin:$GOROOT/bin:/Library/Frameworks/Mono.framework/Versions/5.10.1/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:$HOME/.local/bin/:$HOME/.local/jdk1.8.0_102/bin/:$HOME/Library/Android/sdk/platform-tools:/usr/local/opt/coreutils/libexec/gnubin:$HOME/Library/Python/2.7/bin"
+export LANG=en_US.UTF-8
+#export GOROOT=/usr/local/go
+export GOROOT=/usr/local/opt/go/libexec/
+export GOPATH=$HOME/go
+export EDITOR='vim'
+export SHELL='zsh'
+export PATH="$HOME/.rbenv/shims:/usr/local/bin:$HOME/.linuxbrew/bin:/Applications/CopyQ.app/Contents/MacOS/:$PATH"
+eval $(gdircolors -b ~/.dirc)
+export ZSH_ENV_LOADED="1"
+eval "$(anyenv init -)"
