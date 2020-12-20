@@ -31,8 +31,10 @@ zplug "junegunn/fzf", as:command, use:bin/fzf-tmux
 zplug "junegunn/fzf", use:shell/key-bindings.zsh
 zplug "junegunn/fzf", use:shell/completion.zsh
 zplug "mafredri/zsh-async", from:github
+
 ## Theme configurations
-zplug "sindresorhus/pure", use:pure.zsh, from:github, as:theme
+#zplug "sindresorhus/pure", use:pure.zsh, from:github, as:theme
+zplug romkatv/powerlevel10k, as:theme, depth:1
 #zplug "zsh/nearcolor"
 
 #zplug "themes/cloud", from:oh-my-zsh
@@ -253,11 +255,6 @@ zle -N cd-home
 bindkey "^y" cd-home
 
 ### Alias
-alias docker='sudo docker'
-alias dstart='(){ docker run -it -d $1 /bin/bash }'
-alias drm='docker ps -q -f status=exited|xargs sudo docker rm'
-alias dps='docker ps --all'
-alias da="docker ps -q -f status=running|awk 'NR==1'"
 alias gob='go build -gcflags "-N -l"'
 alias lxc='sudo lxc'
 alias enc='openssl enc -aes-256-cbc -in $1 -out $1.enc'
@@ -282,6 +279,7 @@ alias kope='sshpass -p centos ssh -o "StrictHostKeyChecking no" root@localhost -
 alias sope='sshpass -p clouddept ssh -o "StrictHostKeyChecking no" clouddept@localhost -p 10023'
 alias vd='/opt/cisco/anyconnect/bin/vpn disconnect'
 alias sed='gsed'
+alias tmat='tmux a -t'
 
 
 xmodmap ~/.Xmodmap 2> /dev/null
@@ -407,7 +405,7 @@ else
     }
 fi
 
-function tmux-remake-socket () {
+function tmux-remake-socket() {
     if [ ! $TMUX ]; then
         return
     fi
@@ -421,33 +419,6 @@ function tmux-remake-socket () {
     unset tmux_socket_file
 }
 
-
-# Profiling option
-# if (which zprof > /dev/null) ;then
-#   zprof | less
-# fi
-
-
-PECO=/usr/local/bin/peco
-if [[ ! $TMUX ]]; then
-  ID=`tmux list-sessions`
-  if [[ -z "$ID" ]]; then
-    echo -n session_name:
-    read session_name
-    tmux new-session -s $session_name
-  fi
-  message="New Session"
-  ID="${message}:\n$ID"
-  ID="`echo -e "$ID" | $PECO | cut -d: -f1`"
-  if [[ "$ID" = "${message}" ]]; then
-    echo -n session_name:
-    read session_name
-    tmux new-session -s $session_name
-  elif [[ -n "$ID" ]]; then
-    tmux attach-session -t "$ID"
-  fi
-fi
-
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '~/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/yyamashi/Downloads/google-cloud-sdk/path.zsh.inc'; fi
 
@@ -458,7 +429,38 @@ eval "$(rbenv init -)"
 ## Set path for pyenv
 export PYENV_ROOT="${HOME}/.pyenv"
 if [ -d "${PYENV_ROOT}" ]; then
-    export PATH=${PYENV_ROOT}/bin:$PATH
+    #export PATH=${PYENV_ROOT}/bin:$PATH
     eval "$(pyenv init -)"
     eval "$(pyenv virtualenv-init -)"
 fi
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+function tmux_session_selector() {
+    PECO=/usr/local/bin/peco
+    if [[ ! $TMUX ]]; then
+      ID=`tmux list-sessions`
+      if [[ -z "$ID" ]]; then
+        echo -n session_name:
+        read session_name
+        tmux new-session -s $session_name
+      fi
+      message="New Session"
+      ID="${message}:\n$ID"
+      ID="`echo -e "$ID" | $PECO | cut -d: -f1`"
+      if [[ "$ID" = "${message}" ]]; then
+        echo -n session_name:
+        read session_name
+        tmux new-session -s $session_name
+      elif [[ -n "$ID" ]]; then
+        tmux attach-session -t "$ID"
+      fi
+    fi
+  }
+tmux_session_selector
+# Profiling option
+#  if (which zprof > /dev/null) ;then
+#    zprof | less
+#  fi
+
